@@ -129,6 +129,24 @@ def add_song():
 
     # ADD THE NECESSARY CODE HERE FOR THIS ROUTE TO WORK
 
+    form = SongForm()
+
+    # if the CSRF token is validated after the form is submitted
+    if form.validate_on_submit():
+        title = form.title.data
+        artist = form.artist.data
+
+        # Create a new playlist instance
+        new_song = Song(
+            title=title, artist=artist)
+        db.session.add(new_song)
+
+        db.session.commit()
+        flash("Song created!")
+        return redirect('/songs')
+
+    return render_template('new_song.html', form=form)
+
 
 @app.route("/playlists/<int:playlist_id>/add-song", methods=["GET", "POST"])
 def add_song_to_playlist(playlist_id):
