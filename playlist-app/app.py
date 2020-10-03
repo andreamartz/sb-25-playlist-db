@@ -108,6 +108,10 @@ def show_song(song_id):
 
     # ADD THE NECESSARY CODE HERE FOR THIS ROUTE TO WORK
 
+    song = Song.query.get_or_404(song_id)
+
+    return render_template('song.html', song=song)
+
 
 @app.route("/songs/add", methods=["GET", "POST"])
 def add_song():
