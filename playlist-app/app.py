@@ -57,6 +57,12 @@ def show_playlist(playlist_id):
 
     # ADD THE NECESSARY CODE HERE FOR THIS ROUTE TO WORK
 
+    playlist = Playlist.query.get_or_404(playlist_id)
+
+    songs = playlist.songs
+
+    return render_template('playlist.html', playlist=playlist, songs=songs)
+
 
 @app.route("/playlists/add", methods=["GET", "POST"])
 def add_playlist():
