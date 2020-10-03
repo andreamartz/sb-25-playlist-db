@@ -1,8 +1,9 @@
-from flask import Flask, redirect, render_template
+from flask import Flask, redirect, render_template, flash
 from flask_debugtoolbar import DebugToolbarExtension
 
 from models import db, connect_db, Playlist, Song, PlaylistSong
 from forms import NewSongForPlaylistForm, SongForm, PlaylistForm
+from sqlalchemy.exc import IntegrityError
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql:///playlist-app'
@@ -17,7 +18,9 @@ app.config['SECRET_KEY'] = "I'LL NEVER TELL!!"
 # Having the Debug Toolbar show redirects explicitly is often useful;
 # however, if you want to turn it off, you can uncomment this line:
 #
-# app.config['DEBUG_TB_INTERCEPT_REDIRECTS'] = False
+# CHECK: ask Michael if this and any other lines (13 db.create_all()?, anything to do with debug toolbar?, etc.?0
+# )
+app.config['DEBUG_TB_INTERCEPT_REDIRECTS'] = False
 
 debug = DebugToolbarExtension(app)
 
@@ -58,6 +61,27 @@ def add_playlist():
 
     # ADD THE NECESSARY CODE HERE FOR THIS ROUTE TO WORK
 
+    form = PlaylistForm()
+
+    # if the CSRF token is validated after the form is submitted
+    if form.validate_on_submit():
+        name = form.name.data
+        description = form.description.data
+
+        # Create a new playlist instance
+        new_playlist = Playlist(
+            name=name, description=description or None)
+        db.session.add(new_playlist)
+
+        try:
+            db.session.commit()
+            flash("Playlist created!")
+            return redirect('/playlists')
+        except IntegrityError:
+            form.name.errors.append(
+                "That playlist name is taken. Please choose another name.")
+
+    return render_template('new_playlist.html', form=form)
 
 ##############################################################################
 # Song routes

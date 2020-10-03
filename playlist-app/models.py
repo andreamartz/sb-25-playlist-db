@@ -9,6 +9,14 @@ class Playlist(db.Model):
     """Playlist."""
 
     # ADD THE NECESSARY CODE HERE
+    __tablename__ = "playlists"
+
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    name = db.Column(db.Text, unique=True, nullable=False)
+    description = db.Column(db.String(200))
+
+    playlists_songs = db.relationship(
+        "PlaylistSong", backref="playlist", cascade="all, delete-orphan")
 
 
 class Song(db.Model):
