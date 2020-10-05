@@ -12,7 +12,6 @@ class PlaylistForm(FlaskForm):
     name = StringField("Playlist Name",
                        validators=[InputRequired(message="Playlist name cannot be blank.")])
 
-    # CHECK: does description need a length validation?
     description = StringField("Playlist Description")
 
 
@@ -27,6 +26,8 @@ class SongForm(FlaskForm):
                          InputRequired(message="Artist cannot be blank.")])
 
 # DO NOT MODIFY THIS FORM - EVERYTHING YOU NEED IS HERE
+
+
 class NewSongForPlaylistForm(FlaskForm):
     """Form for adding a song to playlist."""
 
