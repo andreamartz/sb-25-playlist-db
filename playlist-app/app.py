@@ -17,9 +17,7 @@ app.config['SECRET_KEY'] = "I'LL NEVER TELL!!"
 
 # Having the Debug Toolbar show redirects explicitly is often useful;
 # however, if you want to turn it off, you can uncomment this line:
-#
-# CHECK: ask Michael if this and any other lines (13 db.create_all()?, anything to do with debug toolbar?, etc.?0
-# )
+
 app.config['DEBUG_TB_INTERCEPT_REDIRECTS'] = False
 
 debug = DebugToolbarExtension(app)
@@ -115,8 +113,9 @@ def show_song(song_id):
     # ADD THE NECESSARY CODE HERE FOR THIS ROUTE TO WORK
 
     song = Song.query.get_or_404(song_id)
+    playlists = song.playlists
 
-    return render_template('song.html', song=song)
+    return render_template('song.html', song=song, playlists=playlists)
 
 
 @app.route("/songs/add", methods=["GET", "POST"])
@@ -161,15 +160,23 @@ def add_song_to_playlist(playlist_id):
 
     # Restrict form to songs not already on this playlist
 
-    curr_on_playlist = ...
-    form.song.choices = ...
+    curr_on_playlist = [s.id for s in playlist.songs]
+    form.song.choices = (db.session.query(Song.id, Song.title)
+                         .filter(Song.id.notin_(curr_on_playlist))
+                         .all())
 
     if form.validate_on_submit():
 
-          # ADD THE NECESSARY CODE HERE FOR THIS ROUTE TO WORK
+        # ADD THE NECESSARY CODE HERE FOR THIS ROUTE TO WORK
 
-          return redirect(f"/playlists/{playlist_id}")
+        playlist_song = PlaylistSong(
+            playlist_id=playlist_id, song_id=form.song.data)
+
+        db.session.add(playlist_song)
+        db.session.commit()
+
+        return redirect(f"/playlists/{playlist_id}")
 
     return render_template("add_song_to_playlist.html",
-                             playlist=playlist,
-                             form=form)
+                           playlist=playlist,
+                           form=form)
