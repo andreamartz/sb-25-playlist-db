@@ -18,6 +18,9 @@ class Playlist(db.Model):
     playlists_songs = db.relationship(
         "PlaylistSong", backref="playlist", cascade="all, delete-orphan")
 
+    songs = db.relationship(
+        "Song", secondary="playlists_songs", backref="playlists")
+
 
 class Song(db.Model):
     """Song."""
@@ -37,6 +40,13 @@ class PlaylistSong(db.Model):
     """Mapping of a playlist to a song."""
 
     # ADD THE NECESSARY CODE HERE
+    __tablename__ = "playlists_songs"
+
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    playlist_id = db.Column(db.Integer,
+                            db.ForeignKey('playlists.id'))
+    song_id = db.Column(db.Integer,
+                        db.ForeignKey('songs.id'))
 
 
 # DO NOT MODIFY THIS FUNCTION
